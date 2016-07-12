@@ -1,0 +1,12 @@
+# pergm
+The R package allows to simulate Exponential Random Graph Models (ERGM)
+in parallel. Used network statistics (number of edges, 2-stars and triangles) 
+induce a conditional independence structure amongst the edges of the network.
+A log transformation can be used as well. The log transformation provides 
+a concave function such that linearity and degeneracy problems diminishes.
+The algorithm is implemented in C++ and the parallelization works in C++ 
+via OpenMP (Open Multi-Processing).
+
+For details on the methodology see:
+Maier, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling 
+in Exponential Random Graph Models (ERGM) (to appear)

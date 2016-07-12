@@ -1,0 +1,4 @@
+useDynLib(pergm)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+

@@ -1,0 +1,22 @@
+Package: pergm
+Type: Package
+Title: Parallel Simulation in Exponential Random Graph Models
+Version: 0.1
+Date: 2016-02-01
+Author: Verena Maier [aut, cre], Goeran Kauermann [aut]
+Maintainer: Verena Maier <verena.maier@stat.uni-muenchen.de>
+Description: Simulation of networks in Exponential Random Graph Models can
+    be done in parallel. Furthermore, an extention for additive or log models is
+    implemented for the simulation and the goodness-of-fit.
+License: What license is it under?
+LazyData: TRUE
+Imports:
+    Rcpp (>= 0.12.3),
+    reshape2,
+    igraph,
+    ggplot2,
+    gridExtra,
+    ergm,
+    network
+LinkingTo: Rcpp
+RoxygenNote: 5.0.1
