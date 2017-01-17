@@ -27,12 +27,6 @@ template<typename T>
 int edge_number(Matrix<T>& mat, int dim, int n_cores);
 template<typename T>
 int star2_number(Matrix<T>& mat, int dim, int n_cores);
-// template<typename T>
-// int star3_number(Matrix<T>& mat, int dim, int n_cores);
-// template<typename T>
-// int triangle_number(Matrix<T>& mat, int dim, int n_cores);
-// template<typename T>
-// int triangle_number2(Matrix<T>& mat, int dim, int n_cores);
 template<typename T>
 int triangle_number3(Matrix<T>& mat, int dim, int n_cores);
 
@@ -65,7 +59,7 @@ double theta0, theta1, theta2;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// MAIN FUNCTION (returns statistics only)/////////////////////
+//////////////////////////// MAIN FUNCTION (returns statistics only) ////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 //main_20151117
 
@@ -79,11 +73,6 @@ Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency,
                                           size_t burnin = 1000,
                                           bool log_change = true)
 {
-//ListNumericMatrix
-
-// Rcpp::IntegerMatrix adj1(dim, dim);
-// Rcpp::IntegerMatrix adj2(dim, dim);
-
 
   // initialize parameters
   Matrix<char> adj_mat(dim,dim);
@@ -95,16 +84,13 @@ Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency,
 
   // copy adjacency matrix entries
   adj_mat.init_adj(0, dim, adjacency);
-  //  adj_mat.print();
 
-// Theta flexibel fuer Erweiterung auf mehrere Statistiken
-// theta =  c(-2,0.01,-0.2)
   int k;
   theta0 = theta[0];
   theta1 = theta[1];
   theta2 = theta[2];
 
-  // simulate k netoworks (start for next network from the previous)
+  // simulate k networks (start for next network from the previous)
   for(k=0; k<nsim; k++){
     // number of updates for the first network
     if(k==0) n_update_eff = burnin + n_update;
@@ -117,8 +103,6 @@ Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency,
       sim_nw_c_par(adj_mat, dim, n_update_eff, n_cores, k, log_change);
     }
 
-//     if(k == 0) adj_mat.copy_adj(0, dim, adj1);
-//     if(k == 1) adj_mat.copy_adj(0, dim, adj2);
 
     // calculate statistics for the final networks
     if(n_cores < 2)
@@ -135,7 +119,6 @@ Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency,
       }
 
     }else{
-      //adj_mat.print();
       if(log_change){
         log_stats_temp = stats_log_number(adj_mat, dim, n_cores);
         stats(k,0) = log_stats_temp(0);
@@ -150,7 +133,6 @@ Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency,
     }
   }
   return stats;
-  //return Rcpp::List::create(Rcpp::Named("adj1") = adj1, Rcpp::Named("adj2") = adj2);
 }
 
 
@@ -187,16 +169,14 @@ Rcpp::List simulate_networks_fit_nw(Rcpp::IntegerMatrix adjacency,
 
   // copy adjacency matrix entries
   adj_mat.init_adj(0, dim, adjacency);
-  //  adj_mat.print();
 
-  // Theta flexibel fuer Erweiterung auf mehrere Statistiken
-  // theta =  c(-2,0.01,-0.2)
+
   int k;
   theta0 = theta[0];
   theta1 = theta[1];
   theta2 = theta[2];
 
-  // simulate k netoworks (start for next network from the previous)
+  // simulate k networks (start for next network from the previous)
   for(k=0; k<nsim; k++){
     // number of updates for the first network
     if(k==0) n_update_eff = burnin + n_update;
@@ -223,6 +203,7 @@ Rcpp::List simulate_networks_fit_nw(Rcpp::IntegerMatrix adjacency,
     Rcpp::Named("adj5") = adj5);
 }
 
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // main simulate function parallel
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +215,7 @@ void sim_nw_c_par(Matrix<T>& mat2, size_t dim, size_t n_update, size_t n_cores, 
   size_t nrounds = (size_t) n_update/dim*2;
 
     // for small number of updates to at least one round
-  if(nrounds == 0) nrounds = 1; //neu 25.9
+  if(nrounds == 0) nrounds = 1;
   int dim_ind;
 
   // ignore one row of ind_mat if dim uneven
@@ -247,7 +228,6 @@ void sim_nw_c_par(Matrix<T>& mat2, size_t dim, size_t n_update, size_t n_cores, 
   Matrix<size_t> ind_mat(nrounds, dim);
 
   for(int i=0; i<nrounds; i++ ) {
-    // init row i to {0,...,dim-1}
     for(int j=0; j<dim; j++ ) {
       ind_mat(i,j)=j;
     }
@@ -275,8 +255,6 @@ void sim_nw_c_par(Matrix<T>& mat2, size_t dim, size_t n_update, size_t n_cores, 
     if( tid==0 )     { assert(row_beg==0); }
     if( tid==nth-1 ) { assert(row_end==dim); }
 
-//     // initialize only the first network with zeros
-//     if(k == 0) { mat2.init_rows(row_beg, row_end, 0); }
 
   #pragma omp barrier
 
@@ -294,8 +272,6 @@ void sim_nw_c_par(Matrix<T>& mat2, size_t dim, size_t n_update, size_t n_cores, 
       #pragma omp barrier
     }
   }
-
-   //     mat2.print();
 }
 
 
@@ -310,9 +286,6 @@ void sim_nw_c_ser(Matrix<T>& mat2, size_t dim, size_t n_update, int k, bool log_
   // seed value for rand_r()
   unsigned seed = 31+31337*k;
   int i, j;
-
-//   // initialize only the first network with zeros
-//   if(k == 0) { mat2.init_rows(0, dim, 0); }
 
   for(int m=0; m<n_update; m++ )
   {
@@ -362,7 +335,6 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
     //  change3 = 0.5*((deg_i-1)*((deg_i-1)-1) + (deg_j-1)*((deg_j-1)-1));
     // triangle: number of common neighbors
     change2 = 0.0;
-
     change2 = inner_prod( &(mat(i,0)), &(mat(j,0)), dim);
 
   }else{
@@ -374,14 +346,12 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
     //  change3 = -(0.5*((deg_i)*((deg_i)-1) + (deg_j)*((deg_j)-1)));
     // triangle: number of common neighbors
     change2 = 0.0;
-
     change2 = -inner_prod( &(mat(i,0)), &(mat(j,0)), dim);
   }
 
   // hastings ratio (acceptance probability)
   if(log_change){
     hr = exp((theta0*abs(change0) + theta1*log(abs(change1) + 0.1) + theta2*log(abs(change2) + 0.1))*change0);
-    // hr = exp(theta0*change0 + theta1*log(change1+1) + theta2*log(change2+1));
   }else{
     hr = exp(theta0*change0 + theta1*change1 + theta2*change2);
   }
@@ -485,33 +455,12 @@ int star2_number_ser(Matrix<T>& mat, int dim){
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// NUMBER OF 3-STARS /////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-
-// calculate number of 3-stars via evaluated binomial coefficient
-//template<typename T>
-//int star3_number(Matrix<T>& mat, int dim){
-//  // 3-stars
-//  int star3 = 0;
-//  int l;
-// #pragma omp parallel for reduction (+:star3)
-//  for(l=0; l<dim; l++)
-//  {
-//    star3 = star3 + mat.rowsum(l)*(mat.rowsum(l)-1)*(mat.rowsum(l)-2)/6;
-//  }
-//  return star3;
-//}
-//
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// NUMBER OF TRIANGLES ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // calculate number of triangles via upper matrix multiplication and blocking
 template<typename T>
 int triangle_number3(Matrix<T>& mat, int dim, int n_cores){
-  // triangles (trace(adj_mat^3)/6)
 
   int triangle = 0;
   int tria;
@@ -649,11 +598,9 @@ Rcpp::NumericVector stats_log_number(Matrix<T>& mat, int dim, int n_cores){
             sum_tria = sum_tria + mat(k,p) * mat(l,p);
           }
         }
-      //  printf("mat %d\n", mat(k,l));
         star2 = star2 + mat(k,l)*log(sum_star + 0.1); // log(change + 1)
         sum_star = 0;
         triangle = triangle + mat(k,l)*log(sum_tria + 0.1); // log(change + 1)
-      //  printf("tria %f\n", triangle);
         sum_tria = 0;
       }
     }
@@ -663,9 +610,6 @@ Rcpp::NumericVector stats_log_number(Matrix<T>& mat, int dim, int n_cores){
   stats_log(0) = edge;
   stats_log(1) = star2;
   stats_log(2) = triangle;
-  //   printf("edge_par %d\n", edge);
-  //   printf("star2_par %f\n", star2);
-  //   printf("triangle_par %f\n", triangle);
   return stats_log;
 }
 
@@ -712,9 +656,6 @@ Rcpp::NumericVector stats_log_number_ser(Matrix<T>& mat, int dim, int n_cores){
   stats_log(0) = edge;
   stats_log(1) = star2;
   stats_log(2) = triangle;
-  //   printf("edge_ser %d\n", edge);
-  //   printf("star2_ser %f\n", star2);
-  //   printf("triangle_ser %f\n", triangle);
   return stats_log;
 }
 
@@ -736,106 +677,3 @@ TYPE inner_prod(TYPE *v1, TYPE *v2, size_t size)
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// old helper function
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// // calculate number of triangles via matrix multiplication in sums (Tr(adj_mat^3)/6)
-// template<typename T>
-// int triangle_number2(Matrix<T>& mat, int dim, int n_cores){
-//   // triangles (trace(adj_mat^3)/6)
-//
-//   int triangle = 0;
-//   int tria;
-//
-//   int k_b, k, p_b, p, l_b,l;
-//   int blocksize = 100;
-//   // initialize number of different threads
-//   omp_set_num_threads(n_cores);
-//
-//   // if dim too small do without blocking
-//   if(dim < blocksize){
-// #pragma omp parallel for reduction (+:triangle)
-//     for(k=0; k<dim; k++){
-//       for(l=0; l<dim; l++){
-//         if(l > k){
-//           for(p=0; p<dim; p++){
-//             if(p > l){
-//               tria = mat(k,p)*mat(p,l)*mat(l,k);
-//               triangle = tria + triangle;
-//             }
-//           }
-//         }
-//       }
-//     }
-//
-//     //    printf("triangle %d ", triangle);
-//     return triangle;
-//
-//   }else{
-//     // find divider of dim to have equalized blocksizes, else blocksize = dim
-//     for(p=100; p>2; p--){
-//       if(dim%p == 0){
-//         blocksize = p;
-//         goto loopDone;
-//       }else blocksize = dim;
-//     }
-//     loopDone:
-//
-//       int block;
-//     for(k_b=0; k_b<dim; k_b+=blocksize){
-//       for(l_b=0; l_b<dim; l_b+=blocksize){
-// #pragma omp parallel for reduction(+:triangle)
-//         for(p_b=0; p_b<dim; p_b+=blocksize){
-//           block = blocksize;
-//           for(k=k_b; k<(k_b+block); k++){
-//             for(l=l_b; l<(l_b+block); l++){
-//               for(p=p_b; p<(p_b+block); p++){
-//                 tria=mat(k,p)*mat(p,l)*mat(l,k);
-//                 triangle=tria+triangle;
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//     triangle = triangle/6;
-//
-//     return triangle;
-//   }
-// }
-//
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// old helper function
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// // calculate number of triangles via upper matrix multiplication in sums (Tr(adj_mat^3)/6)
-// template<typename T>
-// int triangle_number(Matrix<T>& mat, int dim, int n_cores){
-//   // triangles (trace(adj_mat^3)/6)
-//   //  auto start = omp_get_wtime();
-//   int triangle = 0;
-//   int tria, k, l, p;
-//   // initialize number of different threads
-//   omp_set_num_threads(n_cores);
-//
-// #pragma omp parallel for reduction (+:triangle)
-//   for(k=0; k<dim; k++)
-//   {
-//     for(l=0; l<dim; l++)
-//     {
-//       if(l > k)
-//       {
-//         for(p=0; p<dim; p++)
-//         {
-//           if(p > l)
-//           {
-//             tria = mat(k,p)*mat(p,l)*mat(l,k);
-//             triangle = tria + triangle;
-//           }
-//         }
-//       }
-//     }
-//   }
-//   return triangle;
-// }
