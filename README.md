@@ -11,5 +11,5 @@ The algorithm is implemented in C++ and the parallelization works in C++
 via OpenMP (Open Multi-Processing).
 
 For details on the methodology see:
-Maier, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling 
+Bauer, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling 
 in Exponential Random Graph Models (ERGM) (to appear)
