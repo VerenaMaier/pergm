@@ -19,24 +19,24 @@
 #' The returned statistics consist of the number of edges, 2-stars and triangles of each simulated network. If \code{log_change} is true, the log transformed statistics are returned. The log transformation provides a concave function such that linearity and degeneracy problems diminishes.
 #' The algorithm is implemented in C++ and the parallelization works in C++ via OpenMP (Open Multi-Processing).
 #' @references
-#' Maier, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling in Exponential Random Graph Models (ERGM) \cr (to appear)
+#' Bauer, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling in Exponential Random Graph Models (ERGM) \cr (to appear)
 #' @examples
 #' # number of nodes
 #' N <- 10
 #' # the given parameter vector of edges, 2-star and triangle
-#' theta <- c(-2, 0.01, -0.2)
+#' theta <- c(-2, 0.01, 0.2)
 #' # simulate one network with an empty adjacency matrix as start
 #' network_stats <- simulate_networks(dim = N, theta = theta, log_change = TRUE)
 #'
 simulate_networks <- function(adjacency = NULL,
-                              dim = NULL,
-                              theta = c(0, 0, 0),
-                              n_update = 1000000,
-                              burnin = 1000,
-                              n_cores = 4,
-                              n_sim = 1,
-                              log_change = TRUE,
-                              return_nw = FALSE){
+  dim = NULL,
+  theta = c(0, 0, 0),
+  n_update = 1000000,
+  burnin = 1000,
+  n_cores = 4,
+  n_sim = 1,
+  log_change = TRUE,
+  return_nw = FALSE){
 
 
   # default values
