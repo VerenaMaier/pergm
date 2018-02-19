@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // simulate_networks_fit
 Rcpp::NumericMatrix simulate_networks_fit(Rcpp::IntegerMatrix adjacency, size_t dim, Rcpp::NumericVector theta, size_t n_update, int n_cores, int nsim, size_t burnin, bool log_change);
-RcppExport SEXP pergm_simulate_networks_fit(SEXP adjacencySEXP, SEXP dimSEXP, SEXP thetaSEXP, SEXP n_updateSEXP, SEXP n_coresSEXP, SEXP nsimSEXP, SEXP burninSEXP, SEXP log_changeSEXP) {
+RcppExport SEXP _pergm_simulate_networks_fit(SEXP adjacencySEXP, SEXP dimSEXP, SEXP thetaSEXP, SEXP n_updateSEXP, SEXP n_coresSEXP, SEXP nsimSEXP, SEXP burninSEXP, SEXP log_changeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -25,7 +25,7 @@ END_RCPP
 }
 // simulate_networks_fit_nw
 Rcpp::List simulate_networks_fit_nw(Rcpp::IntegerMatrix adjacency, size_t dim, Rcpp::NumericVector theta, size_t n_update, int n_cores, int nsim, size_t burnin, bool log_change);
-RcppExport SEXP pergm_simulate_networks_fit_nw(SEXP adjacencySEXP, SEXP dimSEXP, SEXP thetaSEXP, SEXP n_updateSEXP, SEXP n_coresSEXP, SEXP nsimSEXP, SEXP burninSEXP, SEXP log_changeSEXP) {
+RcppExport SEXP _pergm_simulate_networks_fit_nw(SEXP adjacencySEXP, SEXP dimSEXP, SEXP thetaSEXP, SEXP n_updateSEXP, SEXP n_coresSEXP, SEXP nsimSEXP, SEXP burninSEXP, SEXP log_changeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -41,16 +41,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// summary_stats_log
-Rcpp::NumericVector summary_stats_log(Rcpp::IntegerMatrix mat, int dim, int n_cores);
-RcppExport SEXP pergm_summary_stats_log(SEXP matSEXP, SEXP dimSEXP, SEXP n_coresSEXP) {
+// summary_stats_log_c
+Rcpp::NumericVector summary_stats_log_c(Rcpp::IntegerMatrix mat, int dim, int n_cores);
+RcppExport SEXP _pergm_summary_stats_log_c(SEXP matSEXP, SEXP dimSEXP, SEXP n_coresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type mat(matSEXP);
     Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
     Rcpp::traits::input_parameter< int >::type n_cores(n_coresSEXP);
-    rcpp_result_gen = Rcpp::wrap(summary_stats_log(mat, dim, n_cores));
+    rcpp_result_gen = Rcpp::wrap(summary_stats_log_c(mat, dim, n_cores));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_pergm_simulate_networks_fit", (DL_FUNC) &_pergm_simulate_networks_fit, 8},
+    {"_pergm_simulate_networks_fit_nw", (DL_FUNC) &_pergm_simulate_networks_fit_nw, 8},
+    {"_pergm_summary_stats_log_c", (DL_FUNC) &_pergm_summary_stats_log_c, 3},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_pergm(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

@@ -48,9 +48,20 @@ Rcpp::NumericVector stats_log_number_ser(Matrix<T>& mat, int dim, int n_cores);
 template<typename T>
 T inner_prod(T *v1, T *v2, size_t size);
 // wrapper around R's RNG such that we get a uniform distribution over
-// [0,n) as required by the STL algorithm
+// [0,n) as required by the STL algorithm (Dirk Eddelbuettel)
 // to get the same in random_suffle after set.seed(1) in R
 inline int randWrapper(const int n) { return floor(unif_rand()*n); }
+
+
+template<typename T>
+int inner_prod(Matrix<T>& mat, int dim, int i, int j)
+{
+  int sum=0;
+  for(int k=0; k<dim; k++ ) {
+    sum+=mat(i,k)*mat(j,k);
+  }
+  return sum;
+}
 
 
 
@@ -312,6 +323,7 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
   int decision;
 
   mat_ij = mat(i,j);
+  // invert adjacency entry
   mat_ij ^= 1;
 
   deg_i = mat.rowsum(i);
@@ -326,27 +338,26 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
   }
 
   // calculate change statistics
+  // toggle 0 to 1?
   if(mat_ij == 1){
     // change of number of edges
     change0 = 1.0;
     // 2-stars: sum of coloum i and row j
     change1 = deg_i-1 + deg_j-1;
-    // 3-stars: sum of coloum i and row j
-    //  change3 = 0.5*((deg_i-1)*((deg_i-1)-1) + (deg_j-1)*((deg_j-1)-1));
     // triangle: number of common neighbors
     change2 = 0.0;
-    change2 = inner_prod( &(mat(i,0)), &(mat(j,0)), dim);
+    change2 = inner_prod(mat, dim, i , j);
+
 
   }else{
+    // toggle 1 to 0?
     // edges: change of number of edges
     change0 = -1.0 ;
     // 2-stars: sum of coloum i and row j
     change1 = -(deg_i + deg_j);
-    // 3-stars: sum of coloum i and row j
-    //  change3 = -(0.5*((deg_i)*((deg_i)-1) + (deg_j)*((deg_j)-1)));
     // triangle: number of common neighbors
     change2 = 0.0;
-    change2 = -inner_prod( &(mat(i,0)), &(mat(j,0)), dim);
+    change2 = -inner_prod(mat, dim, i , j);
   }
 
   // hastings ratio (acceptance probability)
@@ -355,7 +366,6 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
   }else{
     hr = exp(theta0*change0 + theta1*change1 + theta2*change2);
   }
-
 
   // accept_prob = min{1, hr}
   if(hr < 1) accept_prob = hr;
@@ -367,6 +377,7 @@ void sim_nw_thread(Matrix<T>& mat, int dim, int i, int j, unsigned *seed, bool l
   double r = ((double)rand_r(seed) / (double)(RAND_MAX));
   if(r <= accept_prob) decision = 1;
   else decision = 0;
+
 
   // keep old adj. matrix if decision is 0 otherwise keep new adj. matrix
   if(decision == 1)
@@ -592,7 +603,7 @@ Rcpp::NumericVector stats_log_number(Matrix<T>& mat, int dim, int n_cores){
 
         for(p=0; p<dim; p++)
         {
-          if(p!=k & p!=l)
+          if((p!=k) && (p!=l))
           {
             sum_star = sum_star + mat(k,p) + mat(l,p);
             sum_tria = sum_tria + mat(k,p) * mat(l,p);
@@ -638,7 +649,7 @@ Rcpp::NumericVector stats_log_number_ser(Matrix<T>& mat, int dim, int n_cores){
 
         for(p=0; p<dim; p++)
         {
-          if(p!=k & p!=l)
+          if((p!=k) && (p!=l))
           {
             sum_star = sum_star + mat(k,p) + mat(l,p);
             sum_tria = sum_tria + mat(k,p) * mat(l,p);
@@ -660,20 +671,6 @@ Rcpp::NumericVector stats_log_number_ser(Matrix<T>& mat, int dim, int n_cores){
 }
 
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// other helper function
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename TYPE>
-TYPE inner_prod(TYPE *v1, TYPE *v2, size_t size)
-{
-  TYPE sum=0;
-  for(size_t i=0; i<size; ++i ) {
-    sum+=(*v1++)*(*v2++);
-  }
-  return sum;
-}
 
 
 
