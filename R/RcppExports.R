@@ -2,34 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 simulate_networks_fit <- function(adjacency, dim, theta, n_update = 1000000L, n_cores = 4L, nsim = 1L, burnin = 1000L, log_change = TRUE) {
-    .Call('pergm_simulate_networks_fit', PACKAGE = 'pergm', adjacency, dim, theta, n_update, n_cores, nsim, burnin, log_change)
+    .Call('_pergm_simulate_networks_fit', PACKAGE = 'pergm', adjacency, dim, theta, n_update, n_cores, nsim, burnin, log_change)
 }
 
 simulate_networks_fit_nw <- function(adjacency, dim, theta, n_update = 1000000L, n_cores = 4L, nsim = 1L, burnin = 1000L, log_change = TRUE) {
-    .Call('pergm_simulate_networks_fit_nw', PACKAGE = 'pergm', adjacency, dim, theta, n_update, n_cores, nsim, burnin, log_change)
+    .Call('_pergm_simulate_networks_fit_nw', PACKAGE = 'pergm', adjacency, dim, theta, n_update, n_cores, nsim, burnin, log_change)
 }
 
-#' @title Return log-statistics of edges, 2-star, triangle as summary statistics
-#'
-#' @description Return log-statistics of edges, 2-star, triangle as summary statistics.
-#' Calculation is combined in one loop in C++ and can be done in parallel
-#'
-#' @param mat The adjacency as IntegerMatrix
-#' @param dim The dimension of the adjacency as a number
-#' @param n_cores The number of used cores for parallelization as number
-#' @return A vector of 3 with the number of edges, log number of 2-stars and the log number of triangles
-#'
-#' @examples
-#' # generate symmetric matrix with diag = 0
-#' N <- 10
-#' set.seed(191919)
-#' adjacency <- matrix(rbinom(n = N * N, size = 1, prob = 0.02), N, N)
-#' diag(adjacency) <- 0
-#' adjacency[lower.tri(adjacency)] <- t(adjacency)[lower.tri(adjacency)]
-#'
-#' summary_stats_log(adjacency, dim = N, n_cores = 4)
-#'
-summary_stats_log <- function(mat, dim, n_cores) {
-    .Call('pergm_summary_stats_log', PACKAGE = 'pergm', mat, dim, n_cores)
+summary_stats_log_c <- function(mat, dim, n_cores) {
+    .Call('_pergm_summary_stats_log_c', PACKAGE = 'pergm', mat, dim, n_cores)
 }
 

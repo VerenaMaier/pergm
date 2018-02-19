@@ -19,14 +19,14 @@
 #' The returned statistics consist of the number of edges, 2-stars and triangles of each simulated network. If \code{log_change} is true, the log transformed statistics are returned. The log transformation provides a concave function such that linearity and degeneracy problems diminishes.
 #' The algorithm is implemented in C++ and the parallelization works in C++ via OpenMP (Open Multi-Processing).
 #' @references
-#' Bauer, V., Fürlinger, K., Kauermann G. (2016). A Note on Parallel Sampling in Exponential Random Graph Models (ERGM) \cr (to appear)
+#' Bauer, V., Fürlinger, K., Kauermann G. (2018). A Note on Parallel Sampling in Markov Graphs \cr (to appear)
 #' @examples
 #' # number of nodes
-#' N <- 10
+#' N <- 100
 #' # the given parameter vector of edges, 2-star and triangle
-#' theta <- c(-2, 0.01, 0.2)
+#' theta <- c(-0.1, -0.01, 0.03)
 #' # simulate one network with an empty adjacency matrix as start
-#' network_stats <- simulate_networks(dim = N, theta = theta, log_change = TRUE)
+#' network_stats <- simulate_networks(dim = N, theta = theta, log_change = TRUE, n_sim = 10)
 #'
 simulate_networks <- function(adjacency = NULL,
   dim = NULL,
@@ -94,6 +94,7 @@ simulate_networks <- function(adjacency = NULL,
 #' summary_stats_log(adjacency, n_cores = 4)
 #'
 
+
 summary_stats_log <- function(adjacency = NULL, n_cores = 4){
 
   if(is.null(adjacency)) stop("adjacency matrix has to be specified")
@@ -101,6 +102,6 @@ summary_stats_log <- function(adjacency = NULL, n_cores = 4){
   if(!is.numeric(n_cores)) stop("n_cores has to be numeric")
   dim = nrow(adjacency)
 
-  summary_stats_log_c(mat = adjacency , dim = dim, n_cores = n_cores)
+  summary_stats_log_c(mat = adjacency, dim = dim, n_cores = n_cores)
 
 }
